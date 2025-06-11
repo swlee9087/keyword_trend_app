@@ -38,11 +38,17 @@ def predict_future(df, model, days=[3, 7]):
             })
 
     pred_df = pd.DataFrame(future_results)
-    pred_3 = pred_df.pivot(index="group", columns=None, values="pred_3d")
-    pred_7 = pred_df.pivot(index="group", columns=None, values="pred_7d")
-    final_df = pd.concat([pred_3, pred_7], axis=1)
-    final_df.columns = ["3일 예측", "7일 예측"]
-    return final_df.reset_index()
+    # pred_3 = pred_df.pivot(index="group", columns=None, values="pred_3d")
+    # pred_7 = pred_df.pivot(index="group", columns=None, values="pred_7d")
+    # final_df = pd.concat([pred_3, pred_7], axis=1)
+    # final_df.columns = ["3일 예측", "7일 예측"]
+    pred_df = pred_df.set_index('group')
+    final_df = pred_df.rename(columns={
+        'pred_3d': '3일 예측',
+        'pred_7d': '7일 예측'
+    }).reset_index()
+    
+    return final_df
 
 def step4_forecast(trend_df):
     st.subheader("🔮 향후 검색량 예측 (흥행력)")

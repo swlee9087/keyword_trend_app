@@ -52,7 +52,6 @@ def predict_future(df, model, days=[3, 7]):
 
 def step4_forecast(trend_df):
     st.subheader("🔮 향후 검색량 예측 (흥행력)")
-    # 입력 데이터 로깅
     logger.log(f">>>>>> Predict called: trend_df.shape={getattr(trend_df,'shape',None)}, "
                f"columns={getattr(trend_df,'columns',None)}")
     
@@ -92,7 +91,6 @@ def step4_forecast(trend_df):
         #     labels={"value":"예측 검색비율","group":"키워드"},
         #     height=500
         # )
-        
         # st.plotly_chart(
         #     px.bar(
         #         pred_df.sort_values("3일 예측", ascending=False),
@@ -107,22 +105,35 @@ def step4_forecast(trend_df):
         # )
 
         # 가로 바그래프
+        # df_top = pred_df.sort_values("3일 예측", ascending=False).head(top_n)
+        # fig = px.bar(
+        #     df_top.sort_values("3일 예측"),
+        #     x=["3일 예측", "7일 예측"],
+        #     y="group",
+        #     orientation="h",
+        #     barmode="group",
+        #     title=f"예측된 키워드별 향후 검색량 (Top {top_n})",
+        #     labels={"value": "예측 검색비율", "group": "키워드"},
+        #     height=500
+        # )
+        
+        # Line chart with markers
         df_top = pred_df.sort_values("3일 예측", ascending=False).head(top_n)
-        fig = px.bar(
+        fig = px.line(
             df_top.sort_values("3일 예측"),
-            x=["3일 예측", "7일 예측"],
-            y="group",
-            orientation="h",
-            barmode="group",
+            x="group",
+            y=["3일 예측", "7일 예측"],
+            markers=True,
             title=f"예측된 키워드별 향후 검색량 (Top {top_n})",
             labels={"value": "예측 검색비율", "group": "키워드"},
-            height=500
+            height=700
         )
+        
         fig.update_layout(
             margin=dict(l=200, r=20, t=50, b=50),
             legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1)
         )
-        
+        fig.update_traces(marker=dict(size=6), line=dict(width=2))
         st.plotly_chart(fig, use_container_width=True)
         
         logger.log(">>>>>> 예측 결과 시각화 완료")

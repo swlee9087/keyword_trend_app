@@ -99,10 +99,9 @@ def collect_trend_data(keywords, days=7):
     
         # period/date 통일
         cols = full_df.columns.tolist()
-        #period 또는 date계열 컬럼 탐색
-        date_cand = [c for c in cols if c.lower() in ('period', 'date')]
+        date_cand = [c for c in cols if c.lower() in ("period", "date", "time")]
         if not date_cand: 
-            st.error(f"❌ 'period' 또는 'date' 컬럼을 찾을 수 없습니다. 사용 가능한 컬럼: {cols}")
+            st.error(f"❌ 'period', 'date', 'time' 컬럼을 찾을 수 없습니다. 사용 가능한 컬럼: {cols}")
             logger.log(f">>> period column missing, cols={cols}")
             return None
         src = date_cand[0]
@@ -118,7 +117,7 @@ def collect_trend_data(keywords, days=7):
             num_cols = [c for c in num_cols if c != "period"]
             if not num_cols:
                 st.error(f"❌ 'ratio' 컬럼이 없고, 숫자형 컬럼도 없습니다: {cols}")
-                logger.log(f"❌ ratio missing & no numeric: {cols}")
+                logger.log(f">>> ratio missing & no numeric: {cols}")
                 return None
             full_df = full_df.rename(columns={num_cols[0]: "ratio"})
             logger.log(f"🔄 '{num_cols[0]}' → 'ratio'")

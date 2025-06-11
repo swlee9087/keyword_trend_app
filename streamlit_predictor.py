@@ -18,25 +18,41 @@ def create_features(df):
     return df
 
 def predict_future(df, model, days=[3, 7]):
+    """
+    df: 원본 트렌드 데이터프레임 (period, group 컬럼 포함)
+    model: 학습된 LightGBM 모델
+    days: 예측할 future offset 리스트
+    """
     future_results = []
 
     for group in df['group'].unique():
-        group_df = df[df['group'] == group].sort_values("period")
-        last_day = group_df['period'].max()
+        # group_df = df[df['group'] == group].sort_values("period")
+        # last_day = group_df['period'].max()
+        
+        # 가장 마지막 날짜 구하기 
+        last_day = df[df['group']==group]['period'].max()
 
+        # 그룹별 dict 생성
+        row_dict = {'group': group}
         for d in days:
             future_date = last_day + timedelta(days=d)
-            row = pd.DataFrame({
-                "period": [future_date],
-                "group": [group]
-            })
-            row = create_features(row)
+            # row = pd.DataFrame({
+            #     "period": [future_date],
+            #     "group": [group]
+            # })
+            # row = create_features(row)
+            # features = ['dayofweek', 'week', 'month', 'day', 'is_weekend']
+            # pred = model.predict(row[features])[0]
+            feat_row = create_features(
+                pd.DataFrame({'period': [future_date], 'group': [group]})
+            )
             features = ['dayofweek', 'week', 'month', 'day', 'is_weekend']
-            pred = model.predict(row[features])[0]
-            future_results.append({
-                "group": group,
-                f"pred_{d}d": pred
-            })
+            pred = model.predict(feat_row[features])[0]
+            row_dict[f'pred_{d}d'] = pred
+        future_results.append({
+            "group": group,
+            f"pred_{d}d": pred
+        })
 
     pred_df = pd.DataFrame(future_results)
     # pred_3 = pred_df.pivot(index="group", columns=None, values="pred_3d")

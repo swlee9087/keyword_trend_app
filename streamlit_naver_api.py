@@ -66,7 +66,7 @@ def collect_trend_data(keywords, days=7):
     all_data = []
     with st.spinner("네이버 API로 데이터 수집 중..."):
         for batch in keyword_batches:
-            logger.log(f">>>>>> [배치 {batch_idx}/{len(keyword_batches)}] 호출할 그룹: {[g['groupName'] for g in batch]}")
+            logger.log(f">>>>>> [배치 {batch}/{len(keyword_batches)}] 호출할 그룹: {[g['groupName'] for g in batch]}")
             try:
                 result = fetch_naver_trends(batch, start_date, end_date, client_id, client_secret)
                 for group in result['results']:

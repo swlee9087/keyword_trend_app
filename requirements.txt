@@ -1,0 +1,10 @@
+python-dotenv
+streamlit
+pandas
+numpy
+requests
+plotly
+wordcloud
+matplotlib
+scikit-learn
+joblib

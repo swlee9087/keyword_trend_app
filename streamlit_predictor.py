@@ -104,8 +104,9 @@ def step4_forecast(trend_df):
         #     use_container_width=True
         # )
 
+        df_top = pred_df.sort_values("3일 예측", ascending=False).head(top_n)
+        
         # 가로 바그래프
-        # df_top = pred_df.sort_values("3일 예측", ascending=False).head(top_n)
         # fig = px.bar(
         #     df_top.sort_values("3일 예측"),
         #     x=["3일 예측", "7일 예측"],
@@ -142,11 +143,19 @@ def step4_forecast(trend_df):
         # 선과 점 크기 조절
         fig.update_traces(line=dict(width=2), marker=dict(size=6))        
         
+        # fig.update_layout(
+        #     margin=dict(l=200, r=20, t=50, b=50),
+        #     legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1)
+        # )
+        # fig.update_traces(marker=dict(size=6), line=dict(width=2))
+        
+        # x축 눈금도 3,7 만 보이게
         fig.update_layout(
+            xaxis=dict(tickmode="array", tickvals=[3,7], ticktext=["3일 뒤","7일 뒤"]),
             margin=dict(l=200, r=20, t=50, b=50),
             legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1)
         )
-        # fig.update_traces(marker=dict(size=6), line=dict(width=2))
+        
         st.plotly_chart(fig, use_container_width=True)
         
         logger.log(">>>>>> 예측 결과 시각화 완료")

@@ -116,24 +116,37 @@ def step4_forecast(trend_df):
         #     labels={"value": "예측 검색비율", "group": "키워드"},
         #     height=500
         # )
-        
-        # Line chart with markers
-        df_top = pred_df.sort_values("3일 예측", ascending=False).head(top_n)
+                
+        # melt 해서 long 포맷으로 변환
+        df_melt = df_top.melt(
+            id_vars="group",
+            value_vars=["3일 예측", "7일 예측"],
+            var_name="기간",
+            value_name="예측값"
+        )
+
+        # '기간' 컬럼에서 숫자만 뽑아 실제 x 축 값으로 사용
+        df_melt["day_offset"] = df_melt["기간"].str.extract(r"(\d+)").astype(int)
+
+        # 라인 차트
         fig = px.line(
-            df_top.sort_values("3일 예측"),
-            x="group",
-            y=["3일 예측", "7일 예측"],
+            df_melt,
+            x="day_offset",
+            y="예측값",
+            color="group",
             markers=True,
             title=f"예측된 키워드별 향후 검색량 (Top {top_n})",
-            labels={"value": "예측 검색비율", "group": "키워드"},
+            labels={"day_offset": "예측 일수(일)", "예측값": "검색비율", "group": "키워드"},
             height=700
         )
+        # 선과 점 크기 조절
+        fig.update_traces(line=dict(width=2), marker=dict(size=6))        
         
         fig.update_layout(
             margin=dict(l=200, r=20, t=50, b=50),
             legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1)
         )
-        fig.update_traces(marker=dict(size=6), line=dict(width=2))
+        # fig.update_traces(marker=dict(size=6), line=dict(width=2))
         st.plotly_chart(fig, use_container_width=True)
         
         logger.log(">>>>>> 예측 결과 시각화 완료")

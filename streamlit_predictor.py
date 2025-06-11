@@ -26,44 +26,28 @@ def predict_future(df, model, days=[3, 7]):
     future_results = []
 
     for group in df['group'].unique():
-        # group_df = df[df['group'] == group].sort_values("period")
-        # last_day = group_df['period'].max()
-        
-        # 가장 마지막 날짜 구하기 
+        # 해당 그룹의 가장 마지막 날짜 구하기 
         last_day = df[df['group']==group]['period'].max()
 
         # 그룹별 dict 생성
         row_dict = {'group': group}
         for d in days:
             future_date = last_day + timedelta(days=d)
-            # row = pd.DataFrame({
-            #     "period": [future_date],
-            #     "group": [group]
-            # })
-            # row = create_features(row)
-            # features = ['dayofweek', 'week', 'month', 'day', 'is_weekend']
-            # pred = model.predict(row[features])[0]
             feat_row = create_features(
                 pd.DataFrame({'period': [future_date], 'group': [group]})
             )
             features = ['dayofweek', 'week', 'month', 'day', 'is_weekend']
             pred = model.predict(feat_row[features])[0]
             row_dict[f'pred_{d}d'] = pred
-        future_results.append({
-            "group": group,
-            f"pred_{d}d": pred
-        })
+            
+        future_results.append(row_dict)
 
-    pred_df = pd.DataFrame(future_results)
-    # pred_3 = pred_df.pivot(index="group", columns=None, values="pred_3d")
-    # pred_7 = pred_df.pivot(index="group", columns=None, values="pred_7d")
-    # final_df = pd.concat([pred_3, pred_7], axis=1)
-    # final_df.columns = ["3일 예측", "7일 예측"]
-    pred_df = pred_df.set_index('group')
-    final_df = pred_df.rename(columns={
+    # 결과 DataFrame으로 변환 후 컬럼명 정리
+    final_df = pd.DataFrame(future_results)
+    final_df = final_df.rename(columns={
         'pred_3d': '3일 예측',
         'pred_7d': '7일 예측'
-    }).reset_index()
+    })
     
     return final_df
 

@@ -5,6 +5,7 @@ import pandas as pd
 import joblib
 import traceback
 from datetime import timedelta
+import plotly.express as px
 from log_util import logger
 
 def create_features(df):

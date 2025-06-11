@@ -8,6 +8,8 @@ import matplotlib.pyplot as plt
 import plotly.graph_objects as go
 from log_util import logger
 
+FONT_PATH = os.path.join(os.getcwd(), "fonts", "NotoSansKR-VF.ttf")
+
 def plot_line_chart(df):
     st.subheader("📈 키워드별 검색 비율 (시간 흐름)")
     fig = px.line(
@@ -48,9 +50,15 @@ def plot_wordcloud(df):
     st.subheader("☁️ 검색량 기반 워드클라우드")
     latest_date = df['period'].max()
     latest_df = df[df['period'] == latest_date]
-
     word_freq = dict(zip(latest_df['group'], latest_df['ratio']))
-    wc = WordCloud(width=800, height=400, background_color='white').generate_from_frequencies(word_freq)
+    wc = WordCloud(
+        font_path=FONT_PATH,    # 한글 폰트 지정
+        width=800,
+        height=400,
+        background_color='white',
+        max_words=100,          # 최대 단어수
+        collocations=False      # 키워드 분리
+    ).generate_from_frequencies(word_freq)
 
     fig, ax = plt.subplots(figsize=(10, 5))
     ax.imshow(wc, interpolation='bilinear')

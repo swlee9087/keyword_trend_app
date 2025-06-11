@@ -13,6 +13,35 @@ FONT_PATH = os.path.join(os.getcwd(), "fonts", "NotoSansKR-VF.ttf")
 
 def plot_line_chart(df):
     st.subheader("📈 키워드별 검색 비율 (시간 흐름)")
+    
+    # 1) 복사 & 필수 컬럼 체크
+    df_plot = df.copy()
+    needed = ["period", "ratio", "group"]
+    missing = [c for c in needed if c not in df_plot.columns]
+    if missing:
+        logger.log(f"plot_line_chart: missing columns {missing}")
+        st.error(f"필수 컬럼이 없습니다: {missing}")
+        return
+
+    # 2) 타입 변환
+    df_plot["period"] = pd.to_datetime(df_plot["period"], errors="coerce")
+    df_plot["ratio"]  = pd.to_numeric(df_plot["ratio"], errors="coerce")
+    df_plot["group"]  = df_plot["group"].astype(str)
+
+    # 3) NaN 제거
+    before, _ = df_plot.shape
+    df_plot = df_plot.dropna(subset=["period", "ratio"])
+    after, _ = df_plot.shape
+    if after < 1:
+        logger.log(f"plot_line_chart: no valid rows after dropna ({before}→{after})")
+        st.warning("시계열에 유효한 데이터가 없습니다.")
+        return
+
+    # 4) 로그 남기기
+    logger.log(f"plot_line_chart: plotting {df_plot['group'].nunique()} groups, "
+               f"rows {after} (dropped {before-after})")
+
+    # 5) 실제 그리기
     fig = px.line(
         df,
         x="period",

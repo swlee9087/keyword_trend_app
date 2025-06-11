@@ -8,3 +8,4 @@ wordcloud
 matplotlib
 scikit-learn
 joblib
+lightgbm

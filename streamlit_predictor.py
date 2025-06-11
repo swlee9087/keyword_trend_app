@@ -97,5 +97,5 @@ def step4_forecast(trend_df):
         
     except Exception as e:
         tb = traceback.format_exc()
-        st.error(f"예측 실패: {e}")
-        logger.log(f">>> 예측 실패: {e}")
+        st.error(f"예측 실패: {e}\n{tb}")
+        logger.log(f">>> 예측 실패: {e}\n{tb}")

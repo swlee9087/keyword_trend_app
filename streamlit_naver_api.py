@@ -80,7 +80,18 @@ def collect_trend_data(keywords, days=7):
 
     if all_data:
         full_df = pd.concat(all_data, ignore_index=True)
-        full_df['period'] = pd.to_datetime(full_df['period'])
+        cols = full_df.columns.tolist()
+        #period 또는 date계열 컬럼 탐색
+        cand = [c for c in cols if c.lower() in ('period', 'date')]
+        if cand: 
+            src = cand[0]
+            if src != 'period':
+                full_df = full_df.rename(columns={src: 'period'})
+            else:
+                st.error(f"❌ 'period' 또는 'date' 컬럼을 찾을 수 없습니다. 사용 가능한 컬럼: {cols}")
+                logger.log(f">>> period column missing, cols={cols}")
+                return None
+        # full_df['period'] = pd.to_datetime(full_df['period'])
         st.success("✅ 데이터 수집 완료")
         logger.log(f">>>>>> 전체 데이터 수집 완료: 총 {len(full_df)}행")
         return full_df

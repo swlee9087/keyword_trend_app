@@ -80,6 +80,9 @@ def collect_trend_data(keywords, days=7):
 
     if all_data:
         full_df = pd.concat(all_data, ignore_index=True)
+        st.write("⚙️ 수집된 컬럼들:", full_df.columns.tolist())
+        logger.log(f">>>>>> collect_trend_data columns: {full_df.columns.tolist()}")
+    
         cols = full_df.columns.tolist()
         #period 또는 date계열 컬럼 탐색
         cand = [c for c in cols if c.lower() in ('period', 'date')]

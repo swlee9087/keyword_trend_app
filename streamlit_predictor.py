@@ -79,15 +79,21 @@ def step4_forecast(trend_df):
         # 결과 표시
         logger.log(f">>>>>> 예측 수행 완료: {len(pred_df)}개 그룹")
         st.dataframe(pred_df.style.format({"3일 예측": "{:.2f}", "7일 예측": "{:.2f}"}))
-        fig = px.bar(
-            pred_df.sort_values("3일 예측", ascending=False),
-            x="group", y=["3일 예측","7일 예측"],
-            barmode="group",
-            title="예측된 키워드별 향후 검색량",
-            labels={"value":"예측 검색비율","group":"키워드"},
-            height=500
-        )
-        st.plotly_chart(fig, use_container_width=True)
+        
+        # Top N 슬라이더 추가
+        max_n = min(50, len(pred_df))
+        top_n = st.slider("🔢 Top N 키워드 갯수", min_value=5, max_value=max_n, value=min(20, max_n))
+        
+        # 세로 바그래프
+        # fig = px.bar(
+        #     pred_df.sort_values("3일 예측", ascending=False),
+        #     x="group", y=["3일 예측","7일 예측"],
+        #     barmode="group",
+        #     title="예측된 키워드별 향후 검색량",
+        #     labels={"value":"예측 검색비율","group":"키워드"},
+        #     height=500
+        # )
+        
         # st.plotly_chart(
         #     px.bar(
         #         pred_df.sort_values("3일 예측", ascending=False),
@@ -100,6 +106,26 @@ def step4_forecast(trend_df):
         #     ),
         #     use_container_width=True
         # )
+
+        # 가로 바그래프
+        df_top = pred_df.sort_values("3일 예측", ascending=False).head(top_n)
+        fig = px.bar(
+            df_top.sort_values("3일 예측"),
+            x=["3일 예측", "7일 예측"],
+            y="group",
+            orientation="h",
+            barmode="group",
+            title=f"예측된 키워드별 향후 검색량 (Top {top_n})",
+            labels={"value": "예측 검색비율", "group": "키워드"},
+            height=500
+        )
+        fig.update_layout(
+            margin=dict(l=200, r=20, t=50, b=50),
+            legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1)
+        )
+        
+        st.plotly_chart(fig, use_container_width=True)
+        
         logger.log(">>>>>> 예측 결과 시각화 완료")
         
     except Exception as e:

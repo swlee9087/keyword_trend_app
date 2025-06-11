@@ -39,8 +39,7 @@ def predict_future(df, model, days=[3, 7]):
             features = ['dayofweek', 'week', 'month', 'day', 'is_weekend']
             pred = model.predict(feat_row[features])[0]
             row_dict[f'pred_{d}d'] = pred
-            
-        future_results.append(row_dict)
+            future_results.append(row_dict)
 
     # 결과 DataFrame으로 변환 후 컬럼명 정리
     final_df = pd.DataFrame(future_results)
